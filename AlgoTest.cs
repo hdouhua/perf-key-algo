@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Attributes;
@@ -13,37 +14,37 @@ namespace perf_key_algo
         [Benchmark]
         public void Test1()
         {
-            //4387721608c0138f61eb52ea27b53bae
+            // 4387721608c0138f61eb52ea27b53bae
             string key = "AGMzNmMyNTcxMDcxNDZkYWZSUlwBAwMGBgEPVgJSBQsFUglQVgNUA1UDBVIAVwAFVWQ4NTQ2ZmY0 MTIwNWRiZDA=";
             var bytes = Convert.FromBase64String(key);
 
             var md5 = Decrypt(ref bytes);
-            System.Diagnostics.Debug.WriteLine("{0}", md5);
+            Debug.WriteLine(md5);
         }
 
         [Benchmark]
         public void Test2()
         {
-            //4387721608c0138f61eb52ea27b53bae
+            // 4387721608c0138f61eb52ea27b53bae
             string key = "AlBWWQZVCwNXVF5WCARRCFUCVVYBAAADAFZSVAcCV1gBIgRjcz46Si5bL2AcIjVbQApbfk9qSwMr";
             var bytes = Convert.FromBase64String(key);
 
             var (botFlag, timestamp, md5) = Decrypt2(ref bytes);
-            System.Diagnostics.Debug.WriteLine("{0}, {1}, {2}", botFlag, timestamp, md5);
+            Debug.WriteLine("{0}, {1}, {2}", botFlag, timestamp, md5);
         }
 
         [Benchmark]
         public void Test3()
         {
-            //4387721608c0138f61eb52ea27b53bae
-            string key = "AgULCwNWVgcABg1TAQkADAdSB1NUAAJUWQEDA1EFVFdQXRQTYGA/YEZYBUw/XSUrU1ReBHBuM3kP";
+            string key = "AgdZBFFWCAcJU1IFBwxXVwYOB1ZcDgBQCAEGVg0BVFIFEHpPdAt0NycXUGkAEEt3Rz8WDhYnNF5h";
             var bytes = Convert.FromBase64String(key);
 
             var (botFlag, timestamp, md5) = Decrypt3(ref bytes);
-            System.Diagnostics.Debug.WriteLine("{0}, {1}, {2}", botFlag, timestamp, md5);
+            Debug.WriteLine("{0}, {1}, {2}", botFlag, timestamp, md5);
+            Debug.Assert("6a7e41697ed64dcd76f89aa022440d62" == md5, "decrypt failed !");
         }
 
-        public static string Decrypt(ref byte[] bytes)
+        private static string Decrypt(ref byte[] bytes)
         {
             if (bytes.Length != 65)
             {
@@ -56,7 +57,7 @@ namespace perf_key_algo
             return Encoding.ASCII.GetString(z);
         }
 
-        public static (byte, long, string) Decrypt2(ref byte[] bytes)
+        private static (byte, long, string) Decrypt2(ref byte[] bytes)
         {
             const int PrefixLength = 33;
             var p2Length = bytes.Length - PrefixLength;
@@ -73,11 +74,11 @@ namespace perf_key_algo
             var timestamp = Encoding.ASCII.GetString(p2[1..]);
 
             //7a92b31cda790c35e6bea0c776eaef1f
-            var p1 = Xor(bytes[1..33], Utils.GetMd5Bytes(timestamp));
+            var p1 = Xor(bytes[1..PrefixLength], Utils.GetMd5Bytes(timestamp));
             return (botFlag, long.Parse(timestamp, System.Globalization.NumberStyles.HexNumber), Encoding.ASCII.GetString(p1));
         }
 
-        public static (byte, long, string) Decrypt3(ref byte[] bytes)
+        private static (byte, long, string) Decrypt3(ref byte[] bytes)
         {
             const int PrefixLength = 33;
             var p2Length = bytes.Length - PrefixLength;
@@ -93,7 +94,7 @@ namespace perf_key_algo
             var botFlag = p2[0];
             var timestamp = Encoding.ASCII.GetString(p2[1..]);
 
-            var p1 = Xor(bytes[1..33], Fill(ref timestamp));
+            var p1 = Xor(bytes[1..PrefixLength], Fill(ref timestamp));
             return (botFlag, long.Parse(timestamp, System.Globalization.NumberStyles.HexNumber), Encoding.ASCII.GetString(p1));
         }
 

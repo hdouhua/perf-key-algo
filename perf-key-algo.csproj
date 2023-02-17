@@ -4,8 +4,9 @@
     <OutputType>Exe</OutputType>
     <TargetFrameworks>netcoreapp3.1;net6.0;</TargetFrameworks>
     <RootNamespace>perf_key_algo</RootNamespace>
-    <Nullable>enable</Nullable>
+    <!-- <Nullable>enable</Nullable> -->
     <Optimize>true</Optimize>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

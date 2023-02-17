@@ -10,7 +10,7 @@ namespace perf_key_algo
         {
             var r = new Byte[40];
 
-            using (var sha1 = SHA1Managed.Create())
+            using (var sha1 = HashAlgorithm.Create("sha1"))
             {
                 byte[] bytes = sha1.ComputeHash(Encoding.ASCII.GetBytes(input));
                 for (int i = 0; i < bytes.Length; i++)
@@ -25,7 +25,7 @@ namespace perf_key_algo
         public static string GetSha1(string input)
         {
             StringBuilder sb = new StringBuilder();
-            using (var sha1 = SHA1Managed.Create())
+            using (var sha1 = HashAlgorithm.Create("sha1"))
             {
                 byte[] bytes = sha1.ComputeHash(Encoding.ASCII.GetBytes(input));
                 for (int i = 0; i < bytes.Length; i++)
